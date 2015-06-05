@@ -1,7 +1,7 @@
 # hubot-visitor
 
 [![npm version](http://img.shields.io/npm/v/hubot-forecast.svg)](https://www.npmjs.org/package/hubot-visitor)
-[![Build Status](http://img.shields.io/travis/oehokie/hubot-visitor.svg)](https://travis-ci.org/jeffbyrnes/hubot-visitor)
+[![Build Status](http://img.shields.io/travis/oehokie/hubot-visitor.svg)](https://travis-ci.org/oehokie/hubot-visitor)
 
 A hubot script to alert slack channel with office visitors.
 
