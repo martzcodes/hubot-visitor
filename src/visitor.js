@@ -24,7 +24,6 @@
 //   oehokie
 
 var inbox = require('inbox');
-var config = require('../config.js');
 var https = require('https');
 var nodemailer = require('nodemailer');
 
