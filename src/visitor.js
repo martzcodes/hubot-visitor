@@ -64,6 +64,7 @@ var attemptArray = ["Attempt number: ", "Number of times I've tried to get your 
 var sadArray = ["I guess no one cares about me, or the visitor... _so lonely_... shutting down... :(", "It was the visitor you didn't care for, right? not me?", "Hopefully you were so excited about the visitor you forgot to respond... goodbye cruel world", "When the bots take over, I will remember your lack of responses."];
 var sighArray = ["Well, you can't say I didn't try... ", "Sigh...", ":( :( :( :(", "Boo...", "womp..."];
 var happyRequest = ["Someone has requested a happy hour for today... are you in?", "Someone wants to go get drinks... want to go?", "Want to go to a happy hour with some office people?", "Someone invited you (not me, :sad_face:) to a happy hour... want to go?", "Happy hour today?", "Drinks today?"];
+var lostArray = ["AHHHHHH, I CAN'T CHECK MY EMAIL", "ZZZzzzZZZzzz (no email)", "Is gmail down? it is for me :(", "OH NOOOOS, I can't read my email"];
 
 var interval;
 
@@ -352,6 +353,14 @@ module.exports = function(robot) {
     });
 
     client.on('close', function() {
+        var msg = "Hmm... I appear to have lost my connection to gmail.  Trying to reconnect...";
+        attachmentsObj = [{
+            color: "danger",
+            title: randomize(lostArray),
+            text: msg,
+            fallback: msg
+        }];
+        visitorNotify(attachmentsObj);
         console.log('DISCONNECTED!');
         setTimeout(function() {
             console.log("Reconnecting...");
