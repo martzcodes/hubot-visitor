@@ -127,6 +127,27 @@ module.exports = function(robot) {
         return;
     });
 
+    robot.respond(/disconnect/i, function(res) {
+        client.close();
+        res.send("Will do, boss");
+    });
+
+    robot.respond(/reconnect/i, function(res) {
+        client.connect();
+        res.send("Trying to connect now...");
+    });
+
+    robot.respond(/get last message/i, function(res) {
+        client.listMessages(0,1,function(err,message){
+            if (err) {
+                console.log(err);
+                res.send("Error in retrieving last: "+err);
+            } else {
+                res.send("Last Message: "+message[0].title);
+            }
+        });
+    });
+
     robot.respond(/testemail/i, function(res) {
         var mailOptions = {
             from: process.env.HUBOT_EMAIL_NICE_NAME + ' <' + process.env.HUBOT_EMAIL_USER + '>', // sender address
@@ -332,7 +353,10 @@ module.exports = function(robot) {
 
     client.on('close', function() {
         console.log('DISCONNECTED!');
-        client.connect();
+        setTimeout(function() {
+            console.log("Reconnecting...");
+            client.connect();
+        },60*1000);
     });
 
     client.connect();
