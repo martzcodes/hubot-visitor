@@ -1,7 +1,7 @@
 {
   "name": "hubot-visitor",
   "description": "A hubot script to alert incoming incoming visitors",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "author": "Matt Martz <matt.martz@gmail.com>",
   "license": "MIT",
 

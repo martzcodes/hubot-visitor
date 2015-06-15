@@ -239,6 +239,14 @@ module.exports = function(robot) {
 
     client.on("connect", function() {
         console.log("Successfully connected to server");
+        var msg = "I have successfully connected to gmail";
+        attachmentsObj = [{
+            color: "good",
+            title: "Everything is ok",
+            text: msg,
+            fallback: msg
+        }];
+        visitorNotify(attachmentsObj);
 
         client.listMailboxes(console.log);
 
@@ -348,7 +356,15 @@ module.exports = function(robot) {
     });
 
     client.on('error', function(err) {
-        console.log('Error');
+        console.log('Error'+err);
+        var msg = "Just got this error from gmail:"+err;
+        attachmentsObj = [{
+            color: "danger",
+            title: "Help?",
+            text: msg,
+            fallback: msg
+        }];
+        visitorNotify(attachmentsObj);
         console.log(err);
     });
 
