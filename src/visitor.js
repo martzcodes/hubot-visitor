@@ -315,57 +315,56 @@ module.exports = function (robot) {
                 });
             });
              */
-        });
-    });
-
-    client.on("new", function (message) {
-        console.log("New incoming message " + message.title);
-        //console.log("message object:", JSON.stringify(message, null, 4));
-        if (visitorWaiting && visitorTitle !== "") {
-            if (message.title.indexOf(visitorTitle) > 0) {
-                visitorWaiting = false;
-                visitorTitle = "";
-                var msg = randomize(congratsArray) + message.from.name;
-                var attachmentsObj = [{
-                    color: "good",
-                    title: randomize(emailResponseTitle),
-                    text: msg,
-                    fallback: msg
-                }];
-                gotIt(attachmentsObj);
-            }
-        } else {
-            processMail(message, function (visitorCheck) {
-                if (visitorCheck) {
-                    //was a visitor, send a slack
-                    visitorTitle = message.title;
-                    visitorWaiting = true;
-                    var msg = '<!channel>, I Received: "' + message.title + '"';
-                    var attachmentsObj = [{
-                        color: "warning",
-                        title: randomize(instructionsArray),
-                        text: msg,
-                        fallback: msg,
-                        fields: [{
-                            title: "From",
-                            value: message.from.name,
-                            short: true
-                        }, {
-                            title: "Date",
-                            value: message.date,
-                            short: true
-                        }]
-                    }];
-                    visitorNotify(attachmentsObj);
-                    annoyInterval();
-                }
-                client.addFlags(message.UID, ['\\Seen'], function (error, flags) {
-                    if (error) {
-                        console.log("error", error);
+            client.on("new", function (message) {
+                console.log("New incoming message " + message.title);
+                //console.log("message object:", JSON.stringify(message, null, 4));
+                if (visitorWaiting && visitorTitle !== "") {
+                    if (message.title.indexOf(visitorTitle) > 0) {
+                        visitorWaiting = false;
+                        visitorTitle = "";
+                        var msg = randomize(congratsArray) + message.from.name;
+                        var attachmentsObj = [{
+                            color: "good",
+                            title: randomize(emailResponseTitle),
+                            text: msg,
+                            fallback: msg
+                        }];
+                        gotIt(attachmentsObj);
                     }
-                });
+                } else {
+                    processMail(message, function (visitorCheck) {
+                        if (visitorCheck) {
+                            //was a visitor, send a slack
+                            visitorTitle = message.title;
+                            visitorWaiting = true;
+                            var msg = '<!channel>, I Received: "' + message.title + '"';
+                            var attachmentsObj = [{
+                                color: "warning",
+                                title: randomize(instructionsArray),
+                                text: msg,
+                                fallback: msg,
+                                fields: [{
+                                    title: "From",
+                                    value: message.from.name,
+                                    short: true
+                                }, {
+                                    title: "Date",
+                                    value: message.date,
+                                    short: true
+                                }]
+                            }];
+                            visitorNotify(attachmentsObj);
+                            annoyInterval();
+                        }
+                        client.addFlags(message.UID, ['\\Seen'], function (error, flags) {
+                            if (error) {
+                                console.log("error", error);
+                            }
+                        });
+                    });
+                }
             });
-        }
+        });
     });
 
     client.on('error', function (err) {
