@@ -13,6 +13,7 @@
 //   HUBOT_EMAIL_DEBUG - debug email address for testing
 //   HUBOT_EMAIL_DEBUG_LAST - last name (simple filter for debugging)
 //   HUBOT_EMAIL_FROM_DOMAIN - domain of person that sends visitor announcements
+//   HUBOT_VISITOR_CHANNEL_DEBUG - Slack Channel where debug messages go
 //
 // Commands:
 //   When a visitor notificiation goes out, replay with "got" in some way... i.e. "got it"
@@ -31,6 +32,7 @@ var visitorWaiting = false;
 var visitorAttempt = 0;
 var visitorTitle = "";
 var visitorChannel = process.env.HUBOT_VISITOR_CHANNEL;
+var debugChannel = process.env.HUBOT_VISITOR_CHANNEL;
 
 var client = inbox.createConnection(false, process.env.HUBOT_EMAIL_HOST, {
     secureConnection: true,
@@ -82,6 +84,15 @@ module.exports = function(robot) {
         });
     }
 
+    function debugNotify(attachment) {
+        robot.emit('slack-attachment', {
+            channel: debugChannel,
+            content: attachment,
+            username: process.env.HUBOT_SLACK_BOTNAME,
+            text: ""
+        });
+    }
+
     function clearAnnoy() {
         visitorWaiting = false;
         visitorTitle = "";
@@ -94,7 +105,7 @@ module.exports = function(robot) {
         visitorNotify(attachmentsObj);
     }
 
-    robot.hear(/got/, function(res) {
+    robot.hear(/got/ig, function (res) {
     	var user = res.message.user.name.toLowerCase();
         if (visitorWaiting === true) {
             var msg = randomize(congratsArray) + '@'+user;
@@ -139,7 +150,7 @@ module.exports = function(robot) {
     });
 
     robot.respond(/get last message/i, function(res) {
-        client.listMessages(0,1,function(err,message){
+        client.listMessages(-1, 1, function (err, message) {
             if (err) {
                 console.log(err);
                 res.send("Error in retrieving last: "+err);
@@ -246,7 +257,7 @@ module.exports = function(robot) {
             text: msg,
             fallback: msg
         }];
-        visitorNotify(attachmentsObj);
+        debugNotify(attachmentsObj);
 
         client.listMailboxes(console.log);
 
@@ -364,7 +375,7 @@ module.exports = function(robot) {
             text: msg,
             fallback: msg
         }];
-        visitorNotify(attachmentsObj);
+        debugNotify(attachmentsObj);
         console.log(err);
     });
 
@@ -376,7 +387,7 @@ module.exports = function(robot) {
             text: msg,
             fallback: msg
         }];
-        visitorNotify(attachmentsObj);
+        debugNotify(attachmentsObj);
         console.log('DISCONNECTED!');
         setTimeout(function() {
             console.log("Reconnecting...");
