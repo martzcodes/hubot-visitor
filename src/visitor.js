@@ -57,7 +57,7 @@ var bots = [];
 var ims = [];
 
 var emailResponseTitle = ["Someone responded by email...", "I think someone got it...", "Got an email response..."];
-var slackResponseTitle = ["Yessss", "I think someone got it...", "Someone listens to me!","Carry on everyone..."];
+var slackResponseTitle = ["Yessss", "I think someone got it...", "Someone listens to me!", "Carry on everyone..."];
 var visitorAnnounce = ['<!channel>, I Received: "', '<!channel>, Somone is here!: "', '<!channel>, Important: "'];
 var congratsArray = ["Thanks for getting the visitor ", "Thanks for getting the visitor and justifying my existence... ", "For getting the visitor, you're an okay person, ", "After you get the visitor, I'll put you on my 'good' list for when the bots take over "];
 var annoyedArray = ["<!channel> Seriously... no one checks #office ?!? Someone please tell me got it for there someone being downstairs...", "<!channel> say 'got it'... DO IT, then go get the visitor", "<!channel> Please be my savior and get the visitor and say 'got it'", "<!channel> I'm begging you... get the visitor and say got it.  It's been a while", "<!channel> Is anyone there?  I'm so lonely... say got it and get the visitor"];
@@ -74,7 +74,7 @@ function randomize(responseArray) {
     return responseArray[Math.floor(Math.random() * responseArray.length)];
 }
 
-module.exports = function(robot) {
+module.exports = function (robot) {
     function visitorNotify(attachment) {
         robot.emit('slack-attachment', {
             channel: visitorChannel,
@@ -106,12 +106,12 @@ module.exports = function(robot) {
     }
 
     robot.hear(/got/ig, function (res) {
-    	var user = res.message.user.name.toLowerCase();
+        var user = res.message.user.name.toLowerCase();
         if (visitorWaiting === true) {
-            var msg = randomize(congratsArray) + '@'+user;
-            var visitorCount = robot.brain.get(user+'-visitor');
+            var msg = randomize(congratsArray) + '@' + user;
+            var visitorCount = robot.brain.get(user + '-visitor');
             visitorCount++;
-            robot.brain.set(user+'-visitor',visitorCount);
+            robot.brain.set(user + '-visitor', visitorCount);
             var attachmentsObj = [{
                 color: "good",
                 pretext: user + " has helped me " + visitorCount + " times",
@@ -126,8 +126,8 @@ module.exports = function(robot) {
                 subject: 'RE: ' + visitorTitle,
                 text: "I'm a bot... so I won't understand any responses, but someone on slack said they 'got this'.  Please do NOT reply to this email. kthxbai"
             };
-            transporter.sendMail(mailOptions, function(error, info){
-                if(error){
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
                     console.log(error);
                 }
                 console.log('Message sent: ' + info.response);
@@ -139,36 +139,36 @@ module.exports = function(robot) {
         return;
     });
 
-    robot.respond(/disconnect/i, function(res) {
+    robot.respond(/disconnect/i, function (res) {
         client.close();
         res.send("Will do, boss");
     });
 
-    robot.respond(/reconnect/i, function(res) {
+    robot.respond(/reconnect/i, function (res) {
         client.connect();
         res.send("Trying to connect now...");
     });
 
-    robot.respond(/get last message/i, function(res) {
-        client.listMessages(-1, 1, function (err, message) {
+    robot.respond(/get last message/i, function (res) {
+        client.listMessages(0, 1, function (err, message) {
             if (err) {
                 console.log(err);
-                res.send("Error in retrieving last: "+err);
+                res.send("Error in retrieving last: " + err);
             } else {
-                res.send("Last Message: "+message[0].title);
+                res.send("Last Message: " + message[0].title);
             }
         });
     });
 
-    robot.respond(/testemail/i, function(res) {
+    robot.respond(/testemail/i, function (res) {
         var mailOptions = {
             from: process.env.HUBOT_EMAIL_NICE_NAME + ' <' + process.env.HUBOT_EMAIL_USER + '>', // sender address
             to: process.env.HUBOT_EMAIL_DEBUG, // list of receivers
             subject: 'Test Email', // Subject line
             text: 'Test email body'
         };
-        transporter.sendMail(mailOptions, function(error, info){
-            if(error){
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
                 return console.log(error);
             }
             console.log('Message sent: ' + info.response);
@@ -178,7 +178,7 @@ module.exports = function(robot) {
 
     function annoyInterval() {
         var msg, attachmentsObj;
-        interval = setInterval(function() {
+        interval = setInterval(function () {
             if (visitorAttempt < 4) {
                 //instructions
                 msg = randomize(instructionsArray);
@@ -248,7 +248,7 @@ module.exports = function(robot) {
         }
     }
 
-    client.on("connect", function() {
+    client.on("connect", function () {
         console.log("Successfully connected to server");
         var msg = "I have successfully connected to gmail";
         attachmentsObj = [{
@@ -261,12 +261,13 @@ module.exports = function(robot) {
 
         client.listMailboxes(console.log);
 
-        client.openMailbox("INBOX", function(error, mailbox) {
+        client.openMailbox("INBOX", function (error, mailbox) {
             if (error) throw error;
 
             // List newest 5 messages
-            client.listMessages(-5, function(err, messages) {
-                messages.forEach(function(message) {
+            /*
+             client.listMessages(-5, function (err, messages) {
+             messages.forEach(function (message) {
                     if (message.flags.indexOf('\\Seen') == -1) {
                         if (visitorWaiting && visitorTitle !== "") {
                             if (message.title.indexOf(visitorTitle) > 0) {
@@ -280,7 +281,7 @@ module.exports = function(robot) {
                                 gotIt(attachmentsObj);
                             }
                         } else {
-                            processMail(message, function(visitorCheck) {
+             processMail(message, function (visitorCheck) {
                                 if (visitorCheck) {
                                     visitorTitle = message.title;
                                     visitorWaiting = true;
@@ -303,7 +304,7 @@ module.exports = function(robot) {
                                     visitorNotify(attachmentsObj);
                                     annoyInterval();
                                 }
-                                client.addFlags(message.UID, ['\\Seen'], function(error, flags) {
+             client.addFlags(message.UID, ['\\Seen'], function (error, flags) {
                                     if (error) {
                                         console.log("error", error);
                                     }
@@ -313,62 +314,63 @@ module.exports = function(robot) {
                     }
                 });
             });
-        });
-
-        client.on("new", function(message) {
-            console.log("New incoming message " + message.title);
-            //console.log("message object:", JSON.stringify(message, null, 4));
-            if (visitorWaiting && visitorTitle !== "") {
-                if (message.title.indexOf(visitorTitle) > 0) {
-                    visitorWaiting = false;
-                    visitorTitle = "";
-                    var msg = randomize(congratsArray) + message.from.name;
-                    var attachmentsObj = [{
-                        color: "good",
-                        title: randomize(emailResponseTitle),
-                        text: msg,
-                        fallback: msg
-                    }];
-                    gotIt(attachmentsObj);
-                }
-            } else {
-                processMail(message, function(visitorCheck) {
-                    if (visitorCheck) {
-                        //was a visitor, send a slack
-                        visitorTitle = message.title;
-                        visitorWaiting = true;
-                        var msg = '<!channel>, I Received: "' + message.title + '"';
-                        var attachmentsObj = [{
-                            color: "warning",
-                            title: randomize(instructionsArray),
-                            text: msg,
-                            fallback: msg,
-                            fields: [{
-                                title: "From",
-                                value: message.from.name,
-                                short: true
-                            }, {
-                                title: "Date",
-                                value: message.date,
-                                short: true
-                            }]
-                        }];
-                        visitorNotify(attachmentsObj);
-                        annoyInterval();
-                    }
-                    client.addFlags(message.UID, ['\\Seen'], function(error, flags) {
-                        if (error) {
-                            console.log("error", error);
-                        }
-                    });
-                });
-            }
+             */
         });
     });
 
-    client.on('error', function(err) {
-        console.log('Error'+err);
-        var msg = "Just got this error from gmail:"+err;
+    client.on("new", function (message) {
+        console.log("New incoming message " + message.title);
+        //console.log("message object:", JSON.stringify(message, null, 4));
+        if (visitorWaiting && visitorTitle !== "") {
+            if (message.title.indexOf(visitorTitle) > 0) {
+                visitorWaiting = false;
+                visitorTitle = "";
+                var msg = randomize(congratsArray) + message.from.name;
+                var attachmentsObj = [{
+                    color: "good",
+                    title: randomize(emailResponseTitle),
+                    text: msg,
+                    fallback: msg
+                }];
+                gotIt(attachmentsObj);
+            }
+        } else {
+            processMail(message, function (visitorCheck) {
+                if (visitorCheck) {
+                    //was a visitor, send a slack
+                    visitorTitle = message.title;
+                    visitorWaiting = true;
+                    var msg = '<!channel>, I Received: "' + message.title + '"';
+                    var attachmentsObj = [{
+                        color: "warning",
+                        title: randomize(instructionsArray),
+                        text: msg,
+                        fallback: msg,
+                        fields: [{
+                            title: "From",
+                            value: message.from.name,
+                            short: true
+                        }, {
+                            title: "Date",
+                            value: message.date,
+                            short: true
+                        }]
+                    }];
+                    visitorNotify(attachmentsObj);
+                    annoyInterval();
+                }
+                client.addFlags(message.UID, ['\\Seen'], function (error, flags) {
+                    if (error) {
+                        console.log("error", error);
+                    }
+                });
+            });
+        }
+    });
+
+    client.on('error', function (err) {
+        console.log('Error' + err);
+        var msg = "Just got this error from gmail:" + err;
         attachmentsObj = [{
             color: "danger",
             title: "Help?",
@@ -379,7 +381,7 @@ module.exports = function(robot) {
         console.log(err);
     });
 
-    client.on('close', function() {
+    client.on('close', function () {
         var msg = "Hmm... I appear to have lost my connection to gmail.  Trying to reconnect...";
         attachmentsObj = [{
             color: "danger",
@@ -389,10 +391,10 @@ module.exports = function(robot) {
         }];
         debugNotify(attachmentsObj);
         console.log('DISCONNECTED!');
-        setTimeout(function() {
+        setTimeout(function () {
             console.log("Reconnecting...");
             client.connect();
-        },60*1000);
+        }, 60 * 1000);
     });
 
     client.connect();
