@@ -32,7 +32,7 @@ var visitorWaiting = false;
 var visitorAttempt = 0;
 var visitorTitle = "";
 var visitorChannel = process.env.HUBOT_VISITOR_CHANNEL;
-var debugChannel = process.env.HUBOT_VISITOR_CHANNEL;
+var debugChannel = process.env.HUBOT_VISITOR_CHANNEL_DEBUG;
 
 var client = inbox.createConnection(false, process.env.HUBOT_EMAIL_HOST, {
     secureConnection: true,
